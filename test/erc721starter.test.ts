@@ -25,4 +25,21 @@ describe("ERC721 Contract Starter", () => {
     expect(alice.address).to.be.equal(result);
     expect(contractBalance).to.be.equal(price);
   });
+
+  it("should mint NFT for two different users", async () => {
+    const [, alice, bob] = await ethers.getSigners();
+    const price = await contract.PRICE();
+    await contract.connect(alice).mint({
+      value: price,
+    });
+    await contract.connect(bob).mint({
+      value: price,
+    });
+    const aliceResult = await contract.ownerOf(0);
+    const bobResult = await contract.ownerOf(1);
+    const contractBalance = await ethers.provider.getBalance(contract.address);
+    expect(alice.address).to.be.equal(aliceResult);
+    expect(bob.address).to.be.equal(bobResult);
+    expect(contractBalance).to.be.equal(price.mul(2));
+  });
 });
