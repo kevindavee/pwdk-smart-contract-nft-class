@@ -42,4 +42,13 @@ describe("ERC721 Contract Starter", () => {
     expect(bob.address).to.be.equal(bobResult);
     expect(contractBalance).to.be.equal(price.mul(2));
   });
+
+  it("should not mint if value provided is not the same as price", async () => {
+    const [, alice] = await ethers.getSigners();
+    await expect(
+      contract.connect(alice).mint({
+        value: ethers.utils.parseEther("0.2"),
+      })
+    ).to.eventually.be.rejectedWith("ether must be same as price");
+  });
 });
