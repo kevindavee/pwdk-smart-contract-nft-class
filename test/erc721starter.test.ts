@@ -16,8 +16,13 @@ describe("ERC721 Contract Starter", () => {
 
   it("should mint an NFT", async function () {
     const [, alice] = await ethers.getSigners();
-    await contract.connect(alice).mint();
+    const price = await contract.PRICE();
+    await contract.connect(alice).mint({
+      value: price,
+    });
     const result = await contract.ownerOf(0);
+    const contractBalance = await ethers.provider.getBalance(contract.address);
     expect(alice.address).to.be.equal(result);
+    expect(contractBalance).to.be.equal(price);
   });
 });
