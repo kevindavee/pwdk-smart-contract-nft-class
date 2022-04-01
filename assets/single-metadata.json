@@ -1,0 +1,20 @@
+{
+  "name": "Happy Ape Bicycle Club",
+  "description": "HABC is an NFT club which is not as rich as BAYC",
+  "external_url": "https://google.com",
+  "image": "https://i.imgflip.com/b8ic7.jpg",
+  "attributes": [
+    {
+      "value": "age",
+      "trait_type": "20"
+    },
+    {
+      "value": "happiness",
+      "trait_type": "high"
+    },
+    {
+      "value": "rarity",
+      "trait_type": "common"
+    }
+  ]
+}

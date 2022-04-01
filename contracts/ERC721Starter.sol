@@ -10,10 +10,35 @@ contract ERC721Starter is ERC721Enumerable {
 
     Counters.Counter private _tokenIds;
 
+    string public baseTokenURI;
     uint256 public constant PRICE = 0.1 ether;
 
-    constructor(string memory name, string memory symbol) ERC721(name, symbol) {
+    constructor(
+        string memory name,
+        string memory symbol,
+        string memory _baseTokenURI
+    ) ERC721(name, symbol) {
+        baseTokenURI = _baseTokenURI;
+    }
 
+    function _baseURI() internal view virtual override returns (string memory) {
+        return baseTokenURI;
+    }
+
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
+    {
+        require(
+            _exists(tokenId),
+            "ERC721Metadata: URI query for nonexistent token"
+        );
+
+        string memory baseURI = _baseURI();
+        return bytes(baseURI).length > 0 ? baseURI : "";
     }
 
     function mint() public payable {
