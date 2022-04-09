@@ -3,9 +3,10 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "./PrivateSale.sol";
 import "hardhat/console.sol";
 
-contract ERC721Starter is ERC721Enumerable {
+contract ERC721Starter is ERC721Enumerable, PrivateSale {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIds;
@@ -16,8 +17,13 @@ contract ERC721Starter is ERC721Enumerable {
     constructor(
         string memory name,
         string memory symbol,
-        string memory _baseTokenURI
-    ) ERC721(name, symbol) {
+        string memory _baseTokenURI,
+        uint256 _privSaleStartTimestamp,
+        uint256 _privSaleEndTimestamp
+    )
+        ERC721(name, symbol)
+        PrivateSale(_privSaleStartTimestamp, _privSaleEndTimestamp)
+    {
         baseTokenURI = _baseTokenURI;
     }
 
