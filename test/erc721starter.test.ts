@@ -51,4 +51,24 @@ describe("ERC721 Contract Starter", () => {
       })
     ).to.eventually.be.rejectedWith("ether must be same as price");
   });
+
+  it("should get the correct user balance after minting", async () => {
+    const [, user1] = await ethers.getSigners();
+    // Get the balance before minting
+    const currentBalance = await user1.getBalance();
+    // Get the price of the NFT
+    const price = await contract.PRICE();
+    // Mint the NFT
+    const tx = await contract.connect(user1).mint({
+      value: price,
+    });
+    // Wait for the receipt to get the gas fee
+    const receipt = await tx.wait();
+    // Gas fee
+    const gasFee = receipt.cumulativeGasUsed.mul(receipt.effectiveGasPrice);
+    // Updated balance of the user (Balance - mint price - gas fee)
+    expect((await user1.getBalance()).toString()).to.be.equal(
+      currentBalance.sub(price).sub(gasFee)
+    );
+  });
 });
