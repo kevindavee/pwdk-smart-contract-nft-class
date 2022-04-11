@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "hardhat/console.sol";
 
 contract ERC721Starter is ERC721Enumerable {
@@ -38,7 +39,13 @@ contract ERC721Starter is ERC721Enumerable {
         );
 
         string memory baseURI = _baseURI();
-        return bytes(baseURI).length > 0 ? baseURI : "";
+        return bytes(baseURI).length > 0 ? string(
+                    abi.encodePacked(
+                        baseURI,
+                        Strings.toString(tokenId),
+                        ".json"
+                    )
+                ) : "";
     }
 
     function mint() public payable {
