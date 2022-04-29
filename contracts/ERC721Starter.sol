@@ -5,9 +5,10 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "./PrivateSale.sol";
+import "./Airdrop.sol";
 import "hardhat/console.sol";
 
-contract ERC721Starter is ERC721Enumerable, PrivateSale {
+contract ERC721Starter is ERC721Enumerable, PrivateSale, Airdrop {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIds;
@@ -24,6 +25,7 @@ contract ERC721Starter is ERC721Enumerable, PrivateSale {
     )
         ERC721(name, symbol)
         PrivateSale(_privSaleStartTimestamp, _privSaleEndTimestamp)
+        Airdrop()
     {
         baseTokenURI = _baseTokenURI;
     }
@@ -56,6 +58,14 @@ contract ERC721Starter is ERC721Enumerable, PrivateSale {
 
     function mint() public payable {
         require(msg.value == PRICE, "ether must be same as price");
+
+        uint256 currentTokenId = _tokenIds.current();
+        _safeMint(msg.sender, currentTokenId);
+        _tokenIds.increment();
+    }
+
+    function claimAirdrop() public {
+        require(addressToAllowedAirdrop[msg.sender], "not eligible for claiming");
 
         uint256 currentTokenId = _tokenIds.current();
         _safeMint(msg.sender, currentTokenId);
