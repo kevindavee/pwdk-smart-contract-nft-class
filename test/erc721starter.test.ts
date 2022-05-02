@@ -1,7 +1,7 @@
 import chaiAsPromised from "chai-as-promised";
 import chai from "chai";
 import { ethers } from "hardhat";
-import { deployContract } from "./utils";
+import { deployContracts } from "./utils";
 import { ERC721Starter } from "../typechain";
 
 chai.use(chaiAsPromised);
@@ -11,7 +11,8 @@ describe("ERC721 Contract Starter", () => {
   let contract: ERC721Starter;
 
   beforeEach(async () => {
-    contract = await deployContract("Happy Ape Bicycle Club", "HABC");
+    contract = (await deployContracts("Happy Ape Bicycle Club", "HABC"))
+      .erc721StaterContract;
   });
 
   it("should mint an NFT", async function () {
