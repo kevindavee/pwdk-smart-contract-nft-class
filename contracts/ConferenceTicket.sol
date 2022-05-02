@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
@@ -10,15 +11,18 @@ contract ConferenceTicket is ERC721Enumerable {
     Counters.Counter private _ticketNumbers;
 
     string public baseTokenURI;
+    address public nftContractAddr;
     
     constructor(
         string memory name,
         string memory symbol,
-        string memory _baseTokenURI
+        string memory _baseTokenURI,
+        address _nftContractAddr
     )
         ERC721(name, symbol)
     {
         baseTokenURI = _baseTokenURI;
+        nftContractAddr = _nftContractAddr;
         // Starting from ticket #1
         _ticketNumbers.increment();
     }
@@ -50,6 +54,8 @@ contract ConferenceTicket is ERC721Enumerable {
     }
 
     function mintTicket() public {
+        uint256 nftBalance = IERC721Enumerable(nftContractAddr).balanceOf(msg.sender);
+        require(nftBalance > 0, "non NFT holder");
         mint(msg.sender);
     }
 
