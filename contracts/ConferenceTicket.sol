@@ -4,8 +4,9 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract ConferenceTicket is ERC721Enumerable {
+contract ConferenceTicket is ERC721Enumerable, Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _ticketNumbers;
@@ -68,5 +69,15 @@ contract ConferenceTicket is ERC721Enumerable {
             address currAddress = _addresses[i];
             mint(currAddress);
         }
+    }
+
+    function verify(bytes32 _hashedMessage, uint8 _v, bytes32 _r, bytes32 _s) public {
+        bytes memory prefix = "\x19Ethereum Signed Message:\n32";
+        bytes32 prefixedHashMessage = keccak256(abi.encodePacked(prefix, _hashedMessage));
+        address signer = ecrecover(prefixedHashMessage, _v, _r, _s);
+        
+        require(signer == owner(), "signature verification failed");
+        
+        // Mark msg.sender to be able to mint group ticket
     }
 }
