@@ -5,8 +5,9 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "hardhat/console.sol";
+import "./PrivateSale.sol";
 
-contract ERC721Starter is ERC721Enumerable {
+contract ERC721Starter is ERC721Enumerable, PrivateSale {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIds;
@@ -18,7 +19,7 @@ contract ERC721Starter is ERC721Enumerable {
         string memory name,
         string memory symbol,
         string memory _baseTokenURI
-    ) ERC721(name, symbol) {
+    ) ERC721(name, symbol) PrivateSale() {
         baseTokenURI = _baseTokenURI;
     }
 
