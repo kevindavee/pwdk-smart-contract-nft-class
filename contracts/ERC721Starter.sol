@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "./PrivateSale.sol";
 import "hardhat/console.sol";
-import "./PrivateSale.sol";
 
 contract ERC721Starter is ERC721Enumerable, PrivateSale {
     using Counters for Counters.Counter;
@@ -57,6 +56,20 @@ contract ERC721Starter is ERC721Enumerable, PrivateSale {
 
     function setBaseURI(string memory newBaseURI) public {
         baseTokenURI = newBaseURI;
+    }
+
+    function privateMint() public payable duringPrivateSale {
+        require(msg.value == PRIVATE_SALE_PRICE, "ether must be same as price");
+        require(addressToMintQty[msg.sender] != 0, "not allowed to mint");
+        require(!addressToDoneMinting[msg.sender], "had minted during private sale");
+
+        for (uint256 i = 0; i < addressToMintQty[msg.sender]; i++) {
+            uint256 currentTokenId = _tokenIds.current();
+            _safeMint(msg.sender, currentTokenId);
+            _tokenIds.increment();
+        }
+
+        addressToDoneMinting[msg.sender] = true;
     }
 
     function mint() public payable {

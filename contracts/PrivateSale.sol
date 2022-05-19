@@ -11,6 +11,8 @@ contract PrivateSale is Ownable {
     mapping(address => uint256) public addressToMintQty;
     mapping(address => bool) public addressToDoneMinting;
 
+    uint256 public constant PRIVATE_SALE_PRICE = 0.01 ether;
+
     constructor(uint256 _startTimestamp, uint256 _endTimestamp) {
         privateSaleStartTimestamp = _startTimestamp;
         privateSaleEndTimestamp = _endTimestamp;
