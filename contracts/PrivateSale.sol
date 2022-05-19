@@ -36,6 +36,10 @@ contract PrivateSale is Ownable {
         }
     }
 
+    function whitelistedAddressesCount() public view returns (uint256) {
+        return whitelistedAddresses.length;
+    }
+
     function clearWhitelist() public onlyOwner {
         for (uint256 i = 0; i < whitelistedAddresses.length; i++) {
             addressToMintQty[whitelistedAddresses[i]] = 0;

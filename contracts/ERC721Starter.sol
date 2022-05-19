@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "./PrivateSale.sol";
 import "hardhat/console.sol";
+import "./PrivateSale.sol";
 
 contract ERC721Starter is ERC721Enumerable, PrivateSale {
     using Counters for Counters.Counter;
@@ -52,6 +53,10 @@ contract ERC721Starter is ERC721Enumerable, PrivateSale {
                         ".json"
                     )
                 ) : "";
+    }
+
+    function setBaseURI(string memory newBaseURI) public {
+        baseTokenURI = newBaseURI;
     }
 
     function mint() public payable {
