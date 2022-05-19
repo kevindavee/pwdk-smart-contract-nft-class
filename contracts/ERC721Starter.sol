@@ -48,6 +48,10 @@ contract ERC721Starter is ERC721Enumerable {
                 ) : "";
     }
 
+    function setBaseURI(string memory newBaseURI) public {
+        baseTokenURI = newBaseURI;
+    }
+
     function mint() public payable {
         require(msg.value == PRICE, "ether must be same as price");
 

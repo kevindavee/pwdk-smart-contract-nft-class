@@ -51,4 +51,18 @@ describe("ERC721 Contract Starter", () => {
       })
     ).to.eventually.be.rejectedWith("ether must be same as price");
   });
+
+  it("should return the correct URI", async () => {
+    const [, alice] = await ethers.getSigners();
+    const price = await contract.PRICE();
+    await contract.connect(alice).mint({
+      value: price,
+    });
+    const uri = await contract.connect(alice).tokenURI(0);
+    expect(uri).to.be.equal("ipfs://myhash");
+
+    await contract.connect(alice).setBaseURI("https://drive.google.com");
+    const newUri = await contract.connect(alice).tokenURI(0);
+    expect(newUri).to.be.equal("https://drive.google.com");
+  });
 });
