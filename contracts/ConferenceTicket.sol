@@ -71,7 +71,7 @@ contract ConferenceTicket is ERC721Enumerable, Ownable {
         }
     }
 
-    function verify(bytes32 _hashedMessage, uint8 _v, bytes32 _r, bytes32 _s) public {
+    function verify(bytes32 _hashedMessage, uint8 _v, bytes32 _r, bytes32 _s) public view {
         bytes memory prefix = "\x19Ethereum Signed Message:\n32";
         bytes32 prefixedHashMessage = keccak256(abi.encodePacked(prefix, _hashedMessage));
         address signer = ecrecover(prefixedHashMessage, _v, _r, _s);
