@@ -133,7 +133,7 @@ describe("Private Sale", () => {
   //   expect(gasFeeForBulkWhitelisting.toNumber()).to.be.equal(gasFeeUsedForIndividualWhitelisting.toNumber());
   // });
 
-  it("should be able to mint for private sale", async () => {
+  it("should be able to mint during private sale", async () => {
     const [, alice] = await ethers.getSigners();
     await contract.addAddressToWhitelist(alice.address, 2);
 
@@ -145,6 +145,18 @@ describe("Private Sale", () => {
 
     const aliceResult = await contract.balanceOf(alice.address);
     expect(aliceResult.toNumber()).to.be.equal(2);
+  });
+
+  it("should not be able to mint if user is not registered for private sale", async () => {
+    const [, alice] = await ethers.getSigners();
+
+    const price = await contract.PRIVATE_SALE_PRICE();
+
+    await expect(
+      contract.connect(alice).privateMint({
+        value: price.mul(2),
+      })
+    ).to.eventually.be.rejectedWith("not allowed to mint");
   });
 
   it("should not be able to mint if ether too low or high", async () => {
@@ -164,18 +176,6 @@ describe("Private Sale", () => {
         value: price,
       })
     ).to.eventually.be.rejectedWith("ether must be same as price");
-  });
-
-  it("should not be able to mint if ether too low or high", async () => {
-    const [, alice] = await ethers.getSigners();
-
-    const price = await contract.PRIVATE_SALE_PRICE();
-
-    await expect(
-      contract.connect(alice).privateMint({
-        value: price.mul(2),
-      })
-    ).to.eventually.be.rejectedWith("not allowed to mint");
   });
 
   it("should not be able to mint twice during private sale", async () => {
