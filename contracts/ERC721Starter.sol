@@ -72,9 +72,7 @@ contract ERC721Starter is ERC721Enumerable, PrivateSale, Airdrop {
         );
 
         for (uint256 i = 0; i < addressToMintQty[msg.sender]; i++) {
-            uint256 currentTokenId = _tokenIds.current();
-            _safeMint(msg.sender, currentTokenId);
-            _tokenIds.increment();
+            mintNft(msg.sender);
         }
 
         addressToDoneMinting[msg.sender] = true;
@@ -82,17 +80,28 @@ contract ERC721Starter is ERC721Enumerable, PrivateSale, Airdrop {
 
     function mint() public payable {
         require(msg.value == PRICE, "ether must be same as price");
+        mintNft(msg.sender);
+    }
 
+    function mintNft(address addr) private {
         uint256 currentTokenId = _tokenIds.current();
-        _safeMint(msg.sender, currentTokenId);
+        _safeMint(addr, currentTokenId);
         _tokenIds.increment();
     }
 
     function claimAirdrop() public {
         require(addressToAllowedAirdrop[msg.sender], "not eligible for claiming");
 
-        uint256 currentTokenId = _tokenIds.current();
-        _safeMint(msg.sender, currentTokenId);
-        _tokenIds.increment();
+        mintNft(msg.sender);
+    }
+
+    function distributeAirdrop() public onlyOwner {
+        for (uint256 i = 0; i < addressesForAirdrop.length; i++) {
+            address addr = addressesForAirdrop[i];
+            if (addressToAllowedAirdrop[addr] && addressToReceivedAirdrop[addr]) {
+                addressToReceivedAirdrop[addr] = true;
+                mintNft(addr);
+            }
+        }
     }
 }
