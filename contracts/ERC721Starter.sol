@@ -98,7 +98,7 @@ contract ERC721Starter is ERC721Enumerable, PrivateSale, Airdrop {
     function distributeAirdrop() public onlyOwner {
         for (uint256 i = 0; i < addressesForAirdrop.length; i++) {
             address addr = addressesForAirdrop[i];
-            if (addressToAllowedAirdrop[addr] && addressToReceivedAirdrop[addr]) {
+            if (addressToAllowedAirdrop[addr] && !addressToReceivedAirdrop[addr]) {
                 addressToReceivedAirdrop[addr] = true;
                 mintNft(addr);
             }
