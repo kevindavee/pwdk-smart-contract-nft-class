@@ -93,6 +93,7 @@ contract ERC721Starter is ERC721Enumerable, PrivateSale, Airdrop {
         require(addressToAllowedAirdrop[msg.sender], "not eligible for claiming");
         require(!addressToReceivedAirdrop[msg.sender], "airdrop has been claimed");
 
+        addressToReceivedAirdrop[msg.sender] = true;
         mintNft(msg.sender);
     }
 

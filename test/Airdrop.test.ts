@@ -1,7 +1,11 @@
-import { expect } from "chai";
+import chaiAsPromised from "chai-as-promised";
+import chai from "chai";
 import { ethers } from "hardhat";
 import { ERC721Starter } from "../typechain";
 import { deployContract } from "./utils";
+
+chai.use(chaiAsPromised);
+const { expect } = chai;
 
 describe("Airdrop", () => {
   let contract: ERC721Starter;
@@ -50,5 +54,34 @@ describe("Airdrop", () => {
     expect(aliceBalance.toNumber()).to.be.equal(1);
     expect(bobBalance.toNumber()).to.be.equal(1);
     expect(charlieBalance.toNumber()).to.be.equal(1);
+  });
+
+  it("should be able to claim NFT", async () => {
+    const [, alice] = await ethers.getSigners();
+    await contract.addAddressForAirdrop(alice.address);
+
+    await contract.connect(alice).claimAirdrop();
+
+    const owner = await contract.ownerOf(0);
+    expect(owner).to.be.eq(alice.address);
+  });
+
+  it("should not be able to claim if address is not registered", async () => {
+    const [, alice] = await ethers.getSigners();
+
+    await expect(
+      contract.connect(alice).claimAirdrop()
+    ).to.eventually.be.rejectedWith("not eligible for claiming");
+  });
+
+  it("should not be able to claim if address is not registered", async () => {
+    const [, alice] = await ethers.getSigners();
+    await contract.addAddressForAirdrop(alice.address);
+
+    await contract.connect(alice).claimAirdrop();
+
+    await expect(
+      contract.connect(alice).claimAirdrop()
+    ).to.eventually.be.rejectedWith("airdrop has been claimed");
   });
 });
