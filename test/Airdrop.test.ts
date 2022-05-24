@@ -74,7 +74,7 @@ describe("Airdrop", () => {
     ).to.eventually.be.rejectedWith("not eligible for claiming");
   });
 
-  it("should not be able to claim if address is not registered", async () => {
+  it("should not be able to claim twice", async () => {
     const [, alice] = await ethers.getSigners();
     await contract.addAddressForAirdrop(alice.address);
 
