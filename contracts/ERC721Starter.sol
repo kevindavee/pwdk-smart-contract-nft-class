@@ -65,7 +65,10 @@ contract ERC721Starter is ERC721Enumerable, PrivateSale, Airdrop {
 
     function privateMint() public payable duringPrivateSale {
         require(addressToMintQty[msg.sender] != 0, "not allowed to mint");
-        require(msg.value == PRIVATE_SALE_PRICE * addressToMintQty[msg.sender], "ether must be same as price");
+        require(
+            msg.value == PRIVATE_SALE_PRICE * addressToMintQty[msg.sender],
+            "ether must be same as price"
+        );
         require(
             !addressToDoneMinting[msg.sender],
             "had minted during private sale"
@@ -90,8 +93,14 @@ contract ERC721Starter is ERC721Enumerable, PrivateSale, Airdrop {
     }
 
     function claimAirdrop() public {
-        require(addressToAllowedAirdrop[msg.sender], "not eligible for claiming");
-        require(!addressToReceivedAirdrop[msg.sender], "airdrop has been claimed");
+        require(
+            addressToAllowedAirdrop[msg.sender],
+            "not eligible for claiming"
+        );
+        require(
+            !addressToReceivedAirdrop[msg.sender],
+            "airdrop has been claimed"
+        );
 
         addressToReceivedAirdrop[msg.sender] = true;
         mintNft(msg.sender);
@@ -100,7 +109,9 @@ contract ERC721Starter is ERC721Enumerable, PrivateSale, Airdrop {
     function distributeAirdrop() public onlyOwner {
         for (uint256 i = 0; i < addressesForAirdrop.length; i++) {
             address addr = addressesForAirdrop[i];
-            if (addressToAllowedAirdrop[addr] && !addressToReceivedAirdrop[addr]) {
+            if (
+                addressToAllowedAirdrop[addr] && !addressToReceivedAirdrop[addr]
+            ) {
                 addressToReceivedAirdrop[addr] = true;
                 mintNft(addr);
             }
