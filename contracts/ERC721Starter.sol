@@ -64,12 +64,9 @@ contract ERC721Starter is ERC721Enumerable, PrivateSale, Airdrop {
     }
 
     function privateMint() public payable duringPrivateSale {
-        require(msg.value == PRIVATE_SALE_PRICE, "ether must be same as price");
         require(addressToMintQty[msg.sender] != 0, "not allowed to mint");
-        require(
-            !addressToDoneMinting[msg.sender],
-            "had minted during private sale"
-        );
+        require(msg.value == PRIVATE_SALE_PRICE * addressToMintQty[msg.sender], "ether must be same as price");
+        require(!addressToDoneMinting[msg.sender], "had minted during private sale");
 
         for (uint256 i = 0; i < addressToMintQty[msg.sender]; i++) {
             uint256 currentTokenId = _tokenIds.current();
