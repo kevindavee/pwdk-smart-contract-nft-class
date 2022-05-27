@@ -63,6 +63,20 @@ contract ERC721Starter is ERC721Enumerable, PrivateSale, Airdrop {
         baseTokenURI = newBaseURI;
     }
 
+    function tokensOfOwner(address _owner)
+        external
+        view
+        returns (uint256[] memory)
+    {
+        uint256 tokenCount = balanceOf(_owner);
+        uint256[] memory tokenIds = new uint256[](tokenCount);
+        for (uint256 i = 0; i < tokenCount; i++) {
+            tokenIds[i] = tokenOfOwnerByIndex(_owner, i);
+        }
+
+        return tokenIds;
+    }
+
     function privateMint() public payable duringPrivateSale {
         require(addressToMintQty[msg.sender] != 0, "not allowed to mint");
         require(
