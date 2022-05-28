@@ -60,4 +60,12 @@ contract PrivateSale is Ownable {
             addressToMintQty[whitelistedAddresses[i]] = 0;
         }
     }
+
+    function setPrivStartTimestamp(uint256 timestamp) public {
+        privateSaleStartTimestamp = timestamp;
+    }
+
+    function setPrivEndTimestamp(uint256 timestamp) public {
+        privateSaleEndTimestamp = timestamp;
+    }
 }
