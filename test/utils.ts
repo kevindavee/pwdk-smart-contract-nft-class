@@ -7,7 +7,7 @@ export async function deployContracts(name: string, symbol: string) {
   const erc721StaterContract = await erc721Starter.deploy(
     name,
     symbol,
-    "ipfs://myhash",
+    "ipfs://myhash/",
     Math.floor(now.getTime() / 1000),
     Math.floor(addDays(now, 7).getTime() / 1000)
   );
