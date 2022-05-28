@@ -84,4 +84,18 @@ contract ConferenceTicket is ERC721Enumerable, Ownable {
         // Mark msg.sender to be able to mint group ticket
         addressToAllowMGroupPurchase[msg.sender] = true;
     }
+
+    function tokensOfOwner(address _owner)
+        external
+        view
+        returns (uint256[] memory)
+    {
+        uint256 tokenCount = balanceOf(_owner);
+        uint256[] memory tokenIds = new uint256[](tokenCount);
+        for (uint256 i = 0; i < tokenCount; i++) {
+            tokenIds[i] = tokenOfOwnerByIndex(_owner, i);
+        }
+
+        return tokenIds;
+    }
 }
