@@ -4,8 +4,9 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Airdrop is Ownable {
-    address[] private addressesForAirdrop;
+    address[] internal addressesForAirdrop;
     mapping(address => bool) public addressToAllowedAirdrop;
+    mapping(address => bool) public addressToReceivedAirdrop;
 
     constructor() {}
 

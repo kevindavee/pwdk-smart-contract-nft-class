@@ -80,10 +80,10 @@ describe("ERC721 Contract Starter", () => {
       value: price,
     });
     const uri = await contract.connect(alice).tokenURI(0);
-    expect(uri).to.be.equal("ipfs://myhash");
+    expect(uri).to.be.equal("ipfs://myhash/0.json");
 
-    await contract.connect(alice).setBaseURI("https://drive.google.com");
+    await contract.connect(alice).setBaseURI("https://drive.google.com/");
     const newUri = await contract.connect(alice).tokenURI(0);
-    expect(newUri).to.be.equal("https://drive.google.com");
+    expect(newUri).to.be.equal("https://drive.google.com/0.json");
   });
 });
