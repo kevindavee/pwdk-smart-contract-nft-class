@@ -12,38 +12,37 @@ async function main() {
   const confName = process.env.CONF_NAME;
   const confSymbol = process.env.CONF_SYMBOL;
   const confBaseUri = process.env.CONF_BASE_URI;
-  if (
-    !name ||
-    !symbol ||
-    !baseUri ||
-    !privSaleStart ||
-    !privSaleEnd ||
-    !confName ||
-    !confSymbol ||
-    !confBaseUri
-  ) {
+  let nftAddress = process.env.NFT_CONTRACT_ADDRESS;
+
+  if (!confName || !confSymbol || !confBaseUri) {
     throw new Error("incomplete env variables");
   }
 
-  const erc721Starter = await ethers.getContractFactory("ERC721Starter");
-  const contract = await erc721Starter.deploy(
-    name,
-    symbol,
-    baseUri,
-    privSaleStart,
-    privSaleEnd
-  );
+  if (!nftAddress) {
+    if (!name || !symbol || !baseUri || !privSaleStart || !privSaleEnd) {
+      throw new Error("incomplete env variables");
+    }
 
-  await contract.deployed();
+    const erc721Starter = await ethers.getContractFactory("ERC721Starter");
+    const contract = await erc721Starter.deploy(
+      name,
+      symbol,
+      baseUri,
+      privSaleStart,
+      privSaleEnd
+    );
+    await contract.deployed();
 
-  console.log("Contract deployed to:", contract.address);
+    console.log("Contract deployed to:", contract.address);
+    nftAddress = contract.address;
+  }
 
   const conferenceFactory = await ethers.getContractFactory("ConferenceTicket");
   const conferenceContract = await conferenceFactory.deploy(
     confName,
     confSymbol,
     confBaseUri,
-    contract.address
+    nftAddress
   );
   await conferenceContract.deployed();
 
