@@ -2,7 +2,7 @@ import chaiAsPromised from "chai-as-promised";
 import chai from "chai";
 import { ethers } from "hardhat";
 import { ERC721Starter } from "../typechain";
-import { deployContract } from "./utils";
+import { deployContracts } from "./utils";
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -11,7 +11,8 @@ describe("Airdrop", () => {
   let contract: ERC721Starter;
 
   beforeEach(async () => {
-    contract = await deployContract("Happy Ape Bicycle Club", "HABC");
+    contract = (await deployContracts("Happy Ape Bicycle Club", "HABC"))
+      .erc721StaterContract;
   });
 
   it("should add address to mapping", async () => {
