@@ -13,6 +13,8 @@ contract ConferenceTicket is ERC721Enumerable, Ownable {
 
     string public baseTokenURI;
     address public nftContractAddr;
+
+    mapping(address => bool) public addressToAllowMGroupPurchase;
     
     constructor(
         string memory name,
@@ -62,6 +64,7 @@ contract ConferenceTicket is ERC721Enumerable, Ownable {
 
     function mintGroupTicket(address[] memory _addresses) public {
         require(_addresses.length == 4, "Must include 4 addresses");
+        require(addressToAllowMGroupPurchase[msg.sender], "not allowed to mint group ticket");
 
         mint(msg.sender);
 
@@ -71,7 +74,7 @@ contract ConferenceTicket is ERC721Enumerable, Ownable {
         }
     }
 
-    function verify(bytes32 _hashedMessage, uint8 _v, bytes32 _r, bytes32 _s) public view {
+    function verify(bytes32 _hashedMessage, uint8 _v, bytes32 _r, bytes32 _s) public {
         bytes memory prefix = "\x19Ethereum Signed Message:\n32";
         bytes32 prefixedHashMessage = keccak256(abi.encodePacked(prefix, _hashedMessage));
         address signer = ecrecover(prefixedHashMessage, _v, _r, _s);
@@ -79,5 +82,6 @@ contract ConferenceTicket is ERC721Enumerable, Ownable {
         require(signer == owner(), "signature verification failed");
         
         // Mark msg.sender to be able to mint group ticket
+        addressToAllowMGroupPurchase[msg.sender] = true;
     }
 }
