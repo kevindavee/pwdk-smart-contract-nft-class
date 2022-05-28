@@ -33,6 +33,33 @@ describe("Conference Ticket", () => {
     expect(result.toNumber()).to.be.equal(1);
   });
 
+  it("should not mint a ticket NFT for non-holders", async () => {
+    const [, alice] = await ethers.getSigners();
+
+    await expect(
+      conferenceContract.connect(alice).mintTicket()
+    ).to.eventually.be.rejectedWith("non NFT holder");
+  });
+
+  it("should not mint a more than 1 ticket to one NFT holder", async () => {
+    const [, alice] = await ethers.getSigners();
+
+    await contract.addAddressToWhitelist(alice.address, 1);
+    const price = await contract.PRIVATE_SALE_PRICE();
+
+    await contract.connect(alice).privateMint({
+      value: price,
+    });
+
+    await conferenceContract.connect(alice).mintTicket();
+    const result = await conferenceContract.balanceOf(alice.address);
+    expect(result.toNumber()).to.be.equal(1);
+
+    await expect(
+      conferenceContract.connect(alice).mintTicket()
+    ).to.eventually.be.rejectedWith("cannot hold more than 1 ticket");
+  });
+
   it("should mint ticket NFTs for holders and 4 other addresses", async () => {
     const [, alice, bob, charlie, dan, edgar] = await ethers.getSigners();
     await contract.addAddressToWhitelist(alice.address, 1);

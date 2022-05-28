@@ -59,6 +59,7 @@ contract ConferenceTicket is ERC721Enumerable, Ownable {
     function mintTicket() public {
         uint256 nftBalance = IERC721Enumerable(nftContractAddr).balanceOf(msg.sender);
         require(nftBalance > 0, "non NFT holder");
+        require(balanceOf(msg.sender) < 1, "cannot hold more than 1 ticket");
         mint(msg.sender);
     }
 
