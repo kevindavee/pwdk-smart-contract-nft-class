@@ -63,18 +63,33 @@ contract ERC721Starter is ERC721Enumerable, PrivateSale, Airdrop {
         baseTokenURI = newBaseURI;
     }
 
+    function tokensOfOwner(address _owner)
+        external
+        view
+        returns (uint256[] memory)
+    {
+        uint256 tokenCount = balanceOf(_owner);
+        uint256[] memory tokenIds = new uint256[](tokenCount);
+        for (uint256 i = 0; i < tokenCount; i++) {
+            tokenIds[i] = tokenOfOwnerByIndex(_owner, i);
+        }
+
+        return tokenIds;
+    }
+
     function privateMint() public payable duringPrivateSale {
-        require(msg.value == PRIVATE_SALE_PRICE, "ether must be same as price");
         require(addressToMintQty[msg.sender] != 0, "not allowed to mint");
+        require(
+            msg.value == PRIVATE_SALE_PRICE * addressToMintQty[msg.sender],
+            "ether must be same as price"
+        );
         require(
             !addressToDoneMinting[msg.sender],
             "had minted during private sale"
         );
 
         for (uint256 i = 0; i < addressToMintQty[msg.sender]; i++) {
-            uint256 currentTokenId = _tokenIds.current();
-            _safeMint(msg.sender, currentTokenId);
-            _tokenIds.increment();
+            mintNft(msg.sender);
         }
 
         addressToDoneMinting[msg.sender] = true;
@@ -82,17 +97,38 @@ contract ERC721Starter is ERC721Enumerable, PrivateSale, Airdrop {
 
     function mint() public payable {
         require(msg.value == PRICE, "ether must be same as price");
+        mintNft(msg.sender);
+    }
 
+    function mintNft(address addr) private {
         uint256 currentTokenId = _tokenIds.current();
-        _safeMint(msg.sender, currentTokenId);
+        _safeMint(addr, currentTokenId);
         _tokenIds.increment();
     }
 
     function claimAirdrop() public {
-        require(addressToAllowedAirdrop[msg.sender], "not eligible for claiming");
+        require(
+            addressToAllowedAirdrop[msg.sender],
+            "not eligible for claiming"
+        );
+        require(
+            !addressToReceivedAirdrop[msg.sender],
+            "airdrop has been claimed"
+        );
 
-        uint256 currentTokenId = _tokenIds.current();
-        _safeMint(msg.sender, currentTokenId);
-        _tokenIds.increment();
+        addressToReceivedAirdrop[msg.sender] = true;
+        mintNft(msg.sender);
+    }
+
+    function distributeAirdrop() public onlyOwner {
+        for (uint256 i = 0; i < addressesForAirdrop.length; i++) {
+            address addr = addressesForAirdrop[i];
+            if (
+                addressToAllowedAirdrop[addr] && !addressToReceivedAirdrop[addr]
+            ) {
+                addressToReceivedAirdrop[addr] = true;
+                mintNft(addr);
+            }
+        }
     }
 }
