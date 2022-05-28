@@ -61,13 +61,25 @@ describe("Conference Ticket", () => {
   });
 
   it("should mint ticket NFTs for holders and 4 other addresses", async () => {
-    const [, alice, bob, charlie, dan, edgar] = await ethers.getSigners();
+    const [owner, alice, bob, charlie, dan, edgar] = await ethers.getSigners();
     await contract.addAddressToWhitelist(alice.address, 1);
     const price = await contract.PRIVATE_SALE_PRICE();
 
     await contract.connect(alice).privateMint({
       value: price,
     });
+
+    const tokensOfAlice = await contract.tokensOfOwner(alice.address);
+    const hash = ethers.utils.solidityKeccak256(
+      ["address", "string"],
+      [alice.address, JSON.stringify(tokensOfAlice)]
+    );
+    const hashBinary = ethers.utils.arrayify(hash);
+    const eligibilitySignature = await owner.signMessage(hashBinary);
+
+    await conferenceContract
+      .connect(alice)
+      .verify(JSON.stringify(tokensOfAlice), eligibilitySignature);
 
     await conferenceContract
       .connect(alice)
@@ -88,5 +100,30 @@ describe("Conference Ticket", () => {
     expect(charlieResult.toNumber()).to.be.equal(1);
     expect(danResult.toNumber()).to.be.equal(1);
     expect(edgarResult.toNumber()).to.be.equal(1);
+  });
+
+  it("should fail the signature verification is signature invalid", async () => {
+    const [owner, alice, bob] = await ethers.getSigners();
+    await contract.addAddressToWhitelist(alice.address, 1);
+    const price = await contract.PRIVATE_SALE_PRICE();
+
+    await contract.connect(alice).privateMint({
+      value: price,
+    });
+
+    const tokensOfAlice = await contract.tokensOfOwner(alice.address);
+    const tokensOfBob = await contract.tokensOfOwner(bob.address);
+    const hash = ethers.utils.solidityKeccak256(
+      ["address", "string"],
+      [alice.address, JSON.stringify(tokensOfBob)]
+    );
+    const hashBinary = ethers.utils.arrayify(hash);
+    const eligibilitySignature = await owner.signMessage(hashBinary);
+
+    await expect(
+      conferenceContract
+        .connect(alice)
+        .verify(JSON.stringify(tokensOfAlice), eligibilitySignature)
+    ).to.eventually.be.rejectedWith("Invalid signature");
   });
 });
