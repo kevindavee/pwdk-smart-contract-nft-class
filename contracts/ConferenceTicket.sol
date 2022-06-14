@@ -16,7 +16,7 @@ contract ConferenceTicket is ERC721Enumerable, Ownable {
     string public baseTokenURI;
     address public nftContractAddr;
 
-    mapping(address => bool) public addressToAllowMGroupPurchase;
+    mapping(address => bool) public addressToAllowGroupPurchase;
     
     constructor(
         string memory name,
@@ -67,7 +67,7 @@ contract ConferenceTicket is ERC721Enumerable, Ownable {
 
     function mintGroupTicket(address[] memory _addresses) public {
         require(_addresses.length == 4, "Must include 4 addresses");
-        require(addressToAllowMGroupPurchase[msg.sender], "not allowed to mint group ticket");
+        require(addressToAllowGroupPurchase[msg.sender], "not allowed to mint group ticket");
 
         mint(msg.sender);
 
@@ -90,7 +90,7 @@ contract ConferenceTicket is ERC721Enumerable, Ownable {
         );
         
         // Mark msg.sender to be able to mint group ticket
-        addressToAllowMGroupPurchase[msg.sender] = true;
+        addressToAllowGroupPurchase[msg.sender] = true;
     }
 
     function tokensOfOwner(address _owner)
