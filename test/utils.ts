@@ -17,7 +17,8 @@ export async function deployContracts(name: string, symbol: string) {
   const confereceTicketContract = await conferenceTicket.deploy(
     "Art Conference",
     "ARTC",
-    "ipfs://myhash"
+    "ipfs://myhash",
+    erc721StaterContract.address
   );
   await confereceTicketContract.deployed();
   return {

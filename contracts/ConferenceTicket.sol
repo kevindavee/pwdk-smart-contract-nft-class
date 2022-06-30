@@ -3,10 +3,12 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ConferenceTicket is ERC721Enumerable, Ownable {
+    using ECDSA for bytes32;
     using Counters for Counters.Counter;
 
     Counters.Counter private _ticketNumbers;
@@ -14,7 +16,7 @@ contract ConferenceTicket is ERC721Enumerable, Ownable {
     string public baseTokenURI;
     address public nftContractAddr;
 
-    mapping(address => bool) public addressToAllowMGroupPurchase;
+    mapping(address => bool) public addressToAllowGroupPurchase;
     
     constructor(
         string memory name,
@@ -59,12 +61,13 @@ contract ConferenceTicket is ERC721Enumerable, Ownable {
     function mintTicket() public {
         uint256 nftBalance = IERC721Enumerable(nftContractAddr).balanceOf(msg.sender);
         require(nftBalance > 0, "non NFT holder");
+        require(balanceOf(msg.sender) < 1, "cannot hold more than 1 ticket");
         mint(msg.sender);
     }
 
     function mintGroupTicket(address[] memory _addresses) public {
         require(_addresses.length == 4, "Must include 4 addresses");
-        require(addressToAllowMGroupPurchase[msg.sender], "not allowed to mint group ticket");
+        require(addressToAllowGroupPurchase[msg.sender], "not allowed to mint group ticket");
 
         mint(msg.sender);
 
@@ -74,15 +77,20 @@ contract ConferenceTicket is ERC721Enumerable, Ownable {
         }
     }
 
-    function verify(bytes32 _hashedMessage, uint8 _v, bytes32 _r, bytes32 _s) public {
-        bytes memory prefix = "\x19Ethereum Signed Message:\n32";
-        bytes32 prefixedHashMessage = keccak256(abi.encodePacked(prefix, _hashedMessage));
-        address signer = ecrecover(prefixedHashMessage, _v, _r, _s);
-        
-        require(signer == owner(), "signature verification failed");
+    function isValidSignature(bytes32 _hash, bytes memory signature) internal view returns (bool) {
+        bytes32 signedHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", _hash));
+        return signedHash.recover(signature) == owner();
+    }
+
+    function verify(string memory stringifiedTokens, bytes memory signature) public {
+        bytes32 msgHash = keccak256(abi.encodePacked(msg.sender, stringifiedTokens));
+        require(
+            isValidSignature(msgHash, signature),          
+            "Invalid signature"
+        );
         
         // Mark msg.sender to be able to mint group ticket
-        addressToAllowMGroupPurchase[msg.sender] = true;
+        addressToAllowGroupPurchase[msg.sender] = true;
     }
 
     function tokensOfOwner(address _owner)
